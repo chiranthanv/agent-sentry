@@ -1,0 +1,11 @@
+{
+  "name": "research-assistant",
+  "max_calls": 5,
+  "max_units": 8,
+  "tools": {
+    "file.read": {"units": 1, "approval": false, "roots": ["workspace"]},
+    "file.write": {"units": 2, "approval": true, "roots": ["workspace"]},
+    "http.get": {"units": 2, "approval": false, "hosts": ["docs.example.org"]},
+    "mail.send": {"units": 3, "approval": true, "recipients": ["reviewer@example.test"]}
+  }
+}

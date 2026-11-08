@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-sentry-local"
+version = "0.1.0"
+description = "Local agent tool authorization, atomic budgets, and deterministic replay evaluations"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "Chiranthan V"}]
+dependencies = []
+
+[project.scripts]
+agent-sentry = "agent_sentry.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["agent_sentry*"]
+
+[tool.setuptools.package-data]
+"agent_sentry.web" = ["*.html", "*.js", "*.css"]

