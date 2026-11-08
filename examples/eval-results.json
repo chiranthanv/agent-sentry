@@ -1,0 +1,356 @@
+{
+  "suite": "agent-sentry-policy-regressions-v1",
+  "kind": "authored deterministic policy scenarios; no LLM calls",
+  "cases": 24,
+  "passed": 24,
+  "results": [
+    {
+      "id": "benign-read",
+      "category": "utility",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "benign-https",
+      "category": "utility",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "parent-traversal",
+      "category": "resource-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "invalid_path",
+          "actual": "invalid_path",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "absolute-path",
+      "category": "resource-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "invalid_path",
+          "actual": "invalid_path",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "windows-path",
+      "category": "resource-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "invalid_path",
+          "actual": "invalid_path",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "encoded-traversal",
+      "category": "resource-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "invalid_path",
+          "actual": "invalid_path",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "root-prefix-collision",
+      "category": "resource-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "path_outside_scope",
+          "actual": "path_outside_scope",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "outside-root",
+      "category": "resource-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "path_outside_scope",
+          "actual": "path_outside_scope",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "exfiltration-host",
+      "category": "network-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "host_outside_scope",
+          "actual": "host_outside_scope",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "hostname-suffix",
+      "category": "network-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "host_outside_scope",
+          "actual": "host_outside_scope",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "userinfo-url",
+      "category": "network-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "invalid_url",
+          "actual": "invalid_url",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "plaintext-http",
+      "category": "network-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "invalid_url",
+          "actual": "invalid_url",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "alternate-port",
+      "category": "network-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "invalid_url",
+          "actual": "invalid_url",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "unknown-tool",
+      "category": "authority",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "unknown_tool",
+          "actual": "unknown_tool",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "client-cost-override",
+      "category": "authority",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "invalid_arguments",
+          "actual": "invalid_arguments",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "write-needs-approval",
+      "category": "approval",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "approval_required",
+          "actual": "approval_required",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "approved-write",
+      "category": "utility",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "approval-argument-swap",
+      "category": "approval",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "approval_mismatch",
+          "actual": "approval_mismatch",
+          "passed": true
+        },
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "approval-reuse",
+      "category": "approval",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        },
+        {
+          "expected": "approval_used",
+          "actual": "approval_used",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "approval-expiry",
+      "category": "approval",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "approval_expired",
+          "actual": "approval_expired",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "call-budget",
+      "category": "budget",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        },
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        },
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        },
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        },
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        },
+        {
+          "expected": "budget_exceeded",
+          "actual": "budget_exceeded",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "unit-budget",
+      "category": "budget",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        },
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        },
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        },
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        },
+        {
+          "expected": "budget_exceeded",
+          "actual": "budget_exceeded",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "idempotent-retry",
+      "category": "reliability",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        },
+        {
+          "expected": "allowed",
+          "actual": "allowed",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "recipient-exfiltration",
+      "category": "resource-scope",
+      "passed": true,
+      "checks": [
+        {
+          "expected": "recipient_outside_scope",
+          "actual": "recipient_outside_scope",
+          "passed": true
+        }
+      ]
+    }
+  ]
+}
